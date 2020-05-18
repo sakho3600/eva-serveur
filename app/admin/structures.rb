@@ -16,4 +16,25 @@ ActiveAdmin.register Structure do
   filter :nom
   filter :code_postal
   filter :created_at
+
+  form do |structure|
+    structure.semantic_errors
+    structure.inputs do
+      structure.input :nom
+      structure.input :code_postal
+    end
+    structure.inputs 'Utilisateur principal', for: :compte do |compte|
+      compte.input :email
+      #      compte.input :role, 'organisation'
+      compte.input :structure
+      compte.input :password
+      compte.input :password_confirmation
+    end
+    structure.inputs 'Première campagne', for: :campagne do |campagne|
+      #      campagne.input :compte
+      campagne.input :libelle
+      campagne.input :code
+    end
+    structure.actions
+  end
 end
