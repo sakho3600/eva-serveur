@@ -107,6 +107,32 @@ describe 'Admin - Campagne', type: :feature do
     end
   end
 
+  describe 'nouveau partenaire', focus: true do
+    context 'en admin' do
+      let(:situation) { create :situation_inventaire }
+      before do
+        Compte.first.update(role: 'administrateur')
+        visit nouveau_partenaire_admin_campagnes_path
+        fill_in :campagne_libelle, with: 'Belfort, pack demandeur'
+        fill_in :campagne_code, with: 'belfortPack'
+
+        fill_in :compte_email, with: 'jeanmarc@nouvelle.structure.fr'
+        fill_in :compte_password, with: 'billyjoel'
+        fill_in :compte_password_confirmation, with: 'billyjoel'
+
+        fill_in :structure_nom, with: 'Nouvelle Structure'
+        fill_in :structure_code_postal, with: '06000'
+      end
+      it do
+        expect do
+          click_on 'Créer'
+        end.to change(Structure, :count)
+          .and change(Compte, :count)
+          .and change(Campagne, :count)
+      end
+    end
+  end
+
   describe 'show' do
     context 'en admin' do
       let(:situation) { create :situation_inventaire }

@@ -1,0 +1,4 @@
+# frozen_string_literal: true
+
+active_admin_form_for [:admin, @campagne] do |f|
+end

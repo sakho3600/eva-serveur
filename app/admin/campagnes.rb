@@ -4,6 +4,7 @@ ActiveAdmin.register Campagne do
   config.batch_actions = false
   permit_params :libelle, :code, :questionnaire_id, :compte,
                 :compte_id, :affiche_competences_fortes,
+                compte_attributes: {},
                 situations_configurations_attributes: %i[id situation_id _destroy]
 
   filter :compte, if: proc { can? :manage, Compte }
@@ -27,10 +28,12 @@ ActiveAdmin.register Campagne do
     render partial: 'show'
   end
 
+  collection_action :nouveau_partenaire do
+  end
+
   form do |f|
-    f.semantic_errors
+    f.semantic_errors *f.object.errors.keys
     f.inputs do
-      f.input :compte if can?(:manage, Compte)
       f.input :libelle
       f.input :code
       f.input :affiche_competences_fortes
@@ -40,12 +43,25 @@ ActiveAdmin.register Campagne do
         c.input :situation
       end
     end
+    f.inputs 'Compte utilisateur' do
+      f.input :compte if can?(:manage, Compte)
+      f.inputs 'Nouveau compte', for: [:compte_attributes, f.object.compte || Compte.new] do |compte|
+        compte.input :email
+        compte.input :role, as: :select, collection: %w[organisation]
+        compte.input :structure
+        compte.input :password
+        compte.input :password_confirmation
+      end
+    end
     f.actions
   end
 
   controller do
     def create
-      params[:campagne][:compte_id] ||= current_compte.id
+      if(params[:campagne][:compte_attributes].blank? &&
+          params[:campagne][:compte_id].blank?)
+        params[:campagne][:compte_id] = current_compte.id
+      end
       create!
     end
   end
